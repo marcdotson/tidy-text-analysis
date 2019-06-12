@@ -12,7 +12,7 @@ text <- c(
 text
 str(text)
 
-text_df <- data_frame(
+text_df <- tibble(
   line = 1:3,
   text = text
 )
@@ -87,7 +87,7 @@ tidy_carroll2 %>%
 library(rvest)
 
 text <- read_html(
-  "https://en.wikipedia.org/wiki/Columbus,_Ohio"
+  "https://en.wikipedia.org/wiki/Provo,_Utah"
   ) %>% 
   html_nodes("#content") %>% 
   html_text() %>% 
@@ -95,23 +95,15 @@ text <- read_html(
   unlist()
 
 # Tokenize, Tidy, and Visualize
-columbus_stop_words <- stop_words %>% 
-  bind_rows(
-    data_frame(
-      word = c("retrieved", "edit"),
-      lexicon = rep("CUSTOM", 2)
-    )
-  )
-
-tidy_text <- data_frame(text) %>% 
+tidy_text <- tibble(text) %>% 
   mutate(section = row_number()) %>% 
   unnest_tokens(word, text) %>% 
-  anti_join(columbus_stop_words)
+  anti_join(stop_words)
 
 tidy_text %>% 
   count(word) %>% 
   mutate(word = reorder(word, n)) %>% 
-  filter(n > 40) %>% 
+  filter(n > 20) %>% 
   ggplot(aes(x = word, y = n)) +
   geom_col() +
   coord_flip()
